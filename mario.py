@@ -4,18 +4,10 @@ class Mario:
     self.action_dim = action_dim
     self.save_dir = save_dir
 
-    self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
     self.exploration_rate = 1
     self.exploration_rate_decay = 0.99999975
     self.exploration_rate_min = 0.1
     self.curr_step = 0
-
-
-    # Cache / memory
-    self.memory = TensorDictReplayBuffer(storage=LazyMemmapStorage(100000, device=self.device))
-    self.batch_size = 32
-
 
   def act(self, state):
 
