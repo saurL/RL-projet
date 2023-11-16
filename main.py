@@ -32,7 +32,8 @@ for i in range(episodes):
     while True:
 
         # Random action for testing
-        action = np.random.randint(env.action_space.n)
+        action = agent.act(state)
+
 
         # Agent performs action
         next_state, reward, done, info = env.step(action)
