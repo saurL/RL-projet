@@ -28,16 +28,17 @@ class Mario:
     self.action_space = Discrete(len(self.actions))
 
     # Define our policy by random policy if no policy is given
+    self.previousStates = []
 
     if not policy:
       self.policy=[1/len(self.actions) for i in range (len(self.actions))]
     else:
       if len(policy) != self.action_space.n:
-        raise Exception("wrong policy size")
+        raise Exception(f"wrong policy size is {len(policy)} shoud be {self.action_space.n}")
       self.policy = policy
 
   def act(self, state):
-
+    self.previousStates.append(state)
     action= np.random.choice(self.actions, p=self.policy)
 
                       
