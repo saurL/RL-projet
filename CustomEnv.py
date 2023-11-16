@@ -18,6 +18,7 @@ class CustomEnv(PyBoyGymEnv):
           pyboy_done = self.pyboy.tick()
       else:
         # when is action_type defined ?
+        
           if self.action_type == "toggle":
               if self._button_is_pressed[action]:
                   self._button_is_pressed[action] = False
