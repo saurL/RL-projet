@@ -37,10 +37,11 @@ for i in range(episodes):
 
         # Agent performs action
         next_state, reward, done, info = env.step(action)
-
+        agent.Q_learning(state,next_state,action,reward)
         # Update state
         state = next_state
         env.render()
         
         if done:
             break
+    

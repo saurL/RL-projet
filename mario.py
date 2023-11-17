@@ -27,8 +27,15 @@ class Mario:
     self.actions = [self._DO_NOTHING] + self._buttons
     self.action_space = Discrete(len(self.actions))
 
-    # Define our policy by random policy if no policy is given
+    # Q_learning value
+    self.learning_rate = 0.8
+    self.discount_factor = 0.95
+    self.defaultActionDict={key: 0 for key in self.actions}
+    self.q_dict = {}
+ 
     self.previousStates = []
+    # Define our policy by random policy if no policy is given
+    
 
     if not policy:
       self.policy=[1/len(self.actions) for i in range (len(self.actions))]
@@ -36,11 +43,21 @@ class Mario:
       if len(policy) != self.action_space.n:
         raise Exception(f"wrong policy size is {len(policy)} shoud be {self.action_space.n}")
       self.policy = policy
+  def Q_learning(self,current_state,next_state,action,reward):
+    currentStateKey= current_state.tobytes()
+    nextStateKey = next_state.tobytes()
+    current_q_values = self.q_dict.get(currentStateKey, self.defaultActionDict)
+    current_q_values[action] = (1 - self.learning_rate) * current_q_values[action] + self.learning_rate * (reward + self.discount_factor * max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
+    self.q_dict[currentStateKey] = current_q_values
+    return
 
   def act(self, state):
-    self.previousStates.append(state)
-    action= np.random.choice(self.actions, p=self.policy)
-
+    stateKey= state.tobytes()
+    actionDict = self.q_dict.get(stateKey, self.defaultActionDict)
+    if np.random.rand() < self.exploration_rate_min:  # Exploration
+      action = np.random.choice(list(actionDict.keys()))
+    else:  # Exploitation
+      action = max(actionDict,key=actionDict.get )
                       
     return action
     """
