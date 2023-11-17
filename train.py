@@ -45,5 +45,5 @@ for i in range(episodes):
 
         if done:
             break
+    agent.saveQ_function()
 
-agent.saveQ_function()
