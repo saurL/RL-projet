@@ -17,6 +17,7 @@ class Mario:
     self._DO_NOTHING = WindowEvent.PASS
     self._buttons = [
       WindowEvent.PRESS_ARROW_RIGHT,
+      WindowEvent.PRESS_ARROW_LEFT,
       WindowEvent.PRESS_BUTTON_A
       ]
 
