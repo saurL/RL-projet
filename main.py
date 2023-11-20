@@ -17,7 +17,7 @@ dir = "placeholder"
 game = "ROM\Super Mario Land (World).gb"
 pyboy = PyBoy(game, game_wrapper=True)
 
-env = CustomEnv(pyboy, action_type="toggle")
+env = CustomEnv(pyboy, action_type="press")
 env = SkipFrame(env, skip=4)
 
 game_wrapper = pyboy.game_wrapper()
@@ -40,7 +40,6 @@ for i in range(episodes):
         agent.Q_learning(state,next_state,action,reward)
         # Update state
         state = next_state
-        env.render()
         
         if done:
             break

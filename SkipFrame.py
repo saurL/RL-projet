@@ -19,7 +19,7 @@ class SkipFrame(gym.Wrapper):
             # Accumulate reward and repeat the same action but without altering button presses
             # If we used the normal step function, it would register button presses
             # And the agent could not move at all
-            obs, reward, done, info = self.env.stepSkip(action)
+            obs, reward, done, info = self.env.step(action)
             
             # Add the rewards together
             total_reward += reward
