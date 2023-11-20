@@ -15,38 +15,16 @@ class CustomEnv(PyBoyGymEnv):
       info = {}
 
       if action == self._DO_NOTHING:
-          pyboy_done = self.pyboy.tick()
+        pyboy_done = self.pyboy.tick()
       else:
-        # when is action_type defined ?
+        self.pyboy.send_input(action)
+        pyboy_done = self.pyboy.tick()
         
-          if self.action_type == "toggle":
-              if self._button_is_pressed[action]:
-                  self._button_is_pressed[action] = False
-                  action = self._release_button[action]
-              else:
-                  self._button_is_pressed[action] = True
+        # Releases button always after it is pressed
+        if self.action_type == "press":
+            self.pyboy.send_input(self._release_button[action])
 
-          self.pyboy.send_input(action)
-          pyboy_done = self.pyboy.tick()
-          
-          if self.action_type == "press":
-              self.pyboy.send_input(self._release_button[action])
-
-      new_fitness = self.game_wrapper.fitness
-      reward = new_fitness - self.last_fitness
-      self.last_fitness = new_fitness
-
-      observation = self._get_observation()
-      done = pyboy_done or self.game_wrapper.game_over()
-
-      return observation, reward, done, info
-  
-  # Step function without button release
-  def stepSkip(self, action_id):
-      info = {}
-
-      pyboy_done = self.pyboy.tick()
-
+      # Reward using the game wrappers fitness metric
       new_fitness = self.game_wrapper.fitness
       reward = new_fitness - self.last_fitness
       self.last_fitness = new_fitness
