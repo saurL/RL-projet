@@ -32,4 +32,6 @@ class CustomEnv(PyBoyGymEnv):
       observation = self._get_observation()
       done = pyboy_done or self.game_wrapper.game_over()
 
+      self.prevState = GameState(self.pyboy)
+
       return observation, reward, done, info
