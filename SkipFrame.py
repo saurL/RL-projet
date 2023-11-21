@@ -9,18 +9,14 @@ class SkipFrame(gym.Wrapper):
     def step(self, action):
 
         """Repeat action, and sum reward"""
+        total_reward = 0
         
-        # First do the initial action.
-        obs, reward, done, info = self.env.step(action)
-        total_reward = reward
-        
-        for i in range(self._skip-1):
+        for i in range(self._skip):
 
             # Accumulate reward and repeat the same action but without altering button presses
             # If we used the normal step function, it would register button presses
             # And the agent could not move at all
             obs, reward, done, info = self.env.step(action)
-            
             # Add the rewards together
             total_reward += reward
 
