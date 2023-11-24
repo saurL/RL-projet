@@ -1,4 +1,5 @@
 import gym
+from GameState import GameState
 # We dont need to act on all of the frames so we can skip them beween actions
 class SkipFrame(gym.Wrapper):
     def __init__(self, env, skip):
@@ -9,21 +10,18 @@ class SkipFrame(gym.Wrapper):
     def step(self, action):
 
         """Repeat action, and sum reward"""
+        total_reward = 0
         
-        # First do the initial action.
-        obs, reward, done, info = self.env.step(action)
-        total_reward = reward
-        
-        for i in range(self._skip-1):
+        for i in range(self._skip):
 
-            # Accumulate reward and repeat the same action but without altering button presses
-            # If we used the normal step function, it would register button presses
-            # And the agent could not move at all
-            obs, reward, done, info = self.env.stepSkip(action)
-            
+            # Accumulate reward and repeat the same action
+            obs, reward, done, info = self.env.step(action)
+
             # Add the rewards together
             total_reward += reward
-
             if done:
                 break
+
+        # Update previous game state
+        self.env.prevState = GameState(self.pyboy)
         return obs, total_reward, done,  info
