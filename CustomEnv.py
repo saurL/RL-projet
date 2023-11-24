@@ -35,8 +35,8 @@ class CustomEnv(PyBoyGymEnv):
     currState = GameState(self.pyboy)
 
     # Compare current score to previous score to get reward
-    currScore = (currState.score + currState.time_left * 10) + currState.level_progress * 15
-    prevScore = (self.prevState.score + self.prevState.time_left * 10) + self.prevState.level_progress * 15
+    currScore = (currState.score + currState.time_left * 10) + currState.real_x_pos * 10
+    prevScore = (self.prevState.score + self.prevState.time_left * 10) + self.prevState.real_x_pos * 10
 
     reward = currScore - prevScore
 
