@@ -38,12 +38,14 @@ for i in range(episodes):
 
 
         # Agent performs action
-        next_state, reward, done, info = env.step(1)
+        next_state, reward, done, info = env.step(action)
         agent.Q_learning(state,next_state,action,reward)
+        agent.saveQ_function()
+        print(reward)
         # Update state
         state = next_state
 
         if done:
             break
 
-agent.saveQ_function()
+

@@ -3,7 +3,7 @@ from gym.spaces import Discrete
 import numpy as np
 
 class Mario:
-  def __init__(self, state_dim, action_dim, save_dir, policy = None ):
+  def __init__(self, state_dim, action_dim, save_dir ):
     self.state_dim = state_dim
     self.action_dim = action_dim
     self.save_dir = save_dir
@@ -17,7 +17,9 @@ class Mario:
     self._DO_NOTHING = WindowEvent.PASS
     self._buttons = [
       WindowEvent.PRESS_ARROW_RIGHT,
-      WindowEvent.PRESS_BUTTON_A
+      WindowEvent.PRESS_ARROW_LEFT,
+      WindowEvent.PRESS_BUTTON_A,
+      WindowEvent.RELEASE_BUTTON_A
       ]
 
     self._buttons_release = [
@@ -37,13 +39,6 @@ class Mario:
     self.previousStates = []
     # Define our policy by random policy if no policy is given
     
-
-    if not policy:
-      self.policy=[1/len(self.actions) for i in range (len(self.actions))]
-    else:
-      if len(policy) != self.action_space.n:
-        raise Exception(f"wrong policy size is {len(policy)} shoud be {self.action_space.n}")
-      self.policy = policy
   def Q_learning(self,current_state,next_state,action,reward):
     currentStateKey= current_state.tobytes()
     nextStateKey = next_state.tobytes()
@@ -67,8 +62,12 @@ class Mario:
     return
 
   def loadQ_function(self):
-    data=np.load(self.Q_learningFunction_file, allow_pickle="TRUE")
-    self.q_dict = data.item()
+    try:
+      data=np.load(self.Q_learningFunction_file, allow_pickle="TRUE")
+      self.q_dict = data.item()
+    except :
+      None
+    
     return
   """
   # Given a state, choose epsilon-greedy action and update the value of the step
