@@ -28,6 +28,7 @@ class Mario:
     self.action_space = Discrete(len(self.actions))
 
     # Q_learning value
+    self.Q_learningFunction_file="Q_function.npy"
     self.learning_rate = 0.8
     self.discount_factor = 0.95
     self.defaultActionDict={key: 0 for key in self.actions}
@@ -60,33 +61,42 @@ class Mario:
       action = max(actionDict,key=actionDict.get )
                       
     return action
-    """
-    # Given a state, choose epsilon-greedy action and update the value of the step
-    # EXPLORE epsilon greedy
 
-    # Mario has 30% chance to walk right
+  def saveQ_function(self):
+    np.save(self.Q_learningFunction_file, self.q_dict)
+    return
 
-    if np.random.rand() < self.exploration_rate:
+  def loadQ_function(self):
+    data=np.load(self.Q_learningFunction_file, allow_pickle="TRUE")
+    self.q_dict = data.item()
+    return
+  """
+  # Given a state, choose epsilon-greedy action and update the value of the step
+  # EXPLORE epsilon greedy
 
-      action_idx = np.random.randint(self.action_dim)
+  # Mario has 30% chance to walk right
 
-    # EXPLOIT
-    else:
-        # Implement exploitation here!!!
-        '''
-        state = np.array(state,dtype = float)
-        action_values = 
-        action_idx = torch.argmax(action_values, dim=1).item()
-        '''
+  if np.random.rand() < self.exploration_rate:
 
-    # decrease exploration_rate
-    self.exploration_rate *= self.exploration_rate_decay
-    self.exploration_rate = max(self.exploration_rate_min, self.exploration_rate)
+    action_idx = np.random.randint(self.action_dim)
 
-    # increment step
-    self.curr_step += 1
-    return action_idx
-    """
-    # cache(): Each time Mario performs an action, he stores the experience to his memory.
-    # His experience includes the current state, action performed, reward from the action,
-    # the next state, and whether the game is done.
+  # EXPLOIT
+  else:
+      # Implement exploitation here!!!
+      '''
+      state = np.array(state,dtype = float)
+      action_values = 
+      action_idx = torch.argmax(action_values, dim=1).item()
+      '''
+
+  # decrease exploration_rate
+  self.exploration_rate *= self.exploration_rate_decay
+  self.exploration_rate = max(self.exploration_rate_min, self.exploration_rate)
+
+  # increment step
+  self.curr_step += 1
+  return action_idx
+  """
+  # cache(): Each time Mario performs an action, he stores the experience to his memory.
+  # His experience includes the current state, action performed, reward from the action,
+  # the next state, and whether the game is done.
