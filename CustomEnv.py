@@ -31,43 +31,43 @@ class CustomEnv(PyBoyGymEnv):
         self.pyboy.send_input(self._release_button[action])
 
 
-        # current state
-        currState = GameState(self.pyboy)
+    # current state
+    currState = GameState(self.pyboy)
 
-        # Time reseting happens weirdly between ticks, so if the difference is larger than 1, reset clock     
-        if currState.time_left - self.prevState.time_left > 1:
-            self.prevState.time_left = 400
+    # Time reseting happens weirdly between ticks, so if the difference is larger than 1, reset clock     
+    if currState.time_left - self.prevState.time_left > 1:
+        self.prevState.time_left = 400
 
-        # IF LIVES HAVE CHANGED MARIO SHOULD HAVE RESPAWNED
-        if (currState.lives_left < self.prevState.lives_left):
-            # Reset the distance
-            self.prevState.real_x_pos = currState.real_x_pos
-            # Reset the clock
-            self.respawned = True
+    # IF LIVES HAVE CHANGED MARIO SHOULD HAVE RESPAWNED
+    if (currState.lives_left < self.prevState.lives_left):
+        # Reset the distance
+        self.prevState.real_x_pos = currState.real_x_pos
+        # Reset the clock
+        self.respawned = True
 
-        currScore = (currState.time_left) + currState.real_x_pos
-        prevScore = (self.prevState.time_left) + self.prevState.real_x_pos
-        reward = currScore - prevScore
+    currScore = (currState.time_left) + currState.real_x_pos
+    prevScore = (self.prevState.time_left) + self.prevState.real_x_pos
+    reward = currScore - prevScore
 
-        # CHECK IF MARIO HAS DIED
-        if (0<self.pyboy.get_memory_value(0xC0AC)<5):
-            if self.respawned:
-                # Since this is behind a flag and it occurs only once for every frame skip
-                reward -= 100
-                self.respawned = False
+    # CHECK IF MARIO HAS DIED
+    if (0<self.pyboy.get_memory_value(0xC0AC)<5):
+        if self.respawned:
+            # Since this is behind a flag and it occurs only once for every frame skip
+            reward -= 100
+            self.respawned = False
 
-        # CHECK IF MARIO FELL OUT OF MAP
-        if (self.pyboy.get_memory_value(0xC201)>183):
-            if self.respawned:
-                # Since this is behind a flag and it occurs only once for every frame skip
-                reward -= 100
-                self.respawned = False
+    # CHECK IF MARIO FELL OUT OF MAP
+    if (self.pyboy.get_memory_value(0xC201)>183):
+        if self.respawned:
+            # Since this is behind a flag and it occurs only once for every frame skip
+            reward -= 100
+            self.respawned = False
 
-        self.prevState = currState
-        observation = self._get_observation()
-        done = pyboy_done or self.game_wrapper.game_over()
+    self.prevState = currState
+    observation = self._get_observation()
+    done = pyboy_done or self.game_wrapper.game_over()
 
-        return observation, reward, done, info
+    return observation, reward, done, info
   def reset(self):
     
       """ Reset (or start) the gym environment throught the game_wrapper """

@@ -36,7 +36,6 @@ for i in range(episodes):
         # Random action for testing
         action = agent.act(state)
 
-
         # Agent performs action
         next_state, reward, done, info = env.step(action)
         agent.Q_learning(state,next_state,action,reward)
