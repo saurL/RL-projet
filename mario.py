@@ -1,6 +1,7 @@
 from pyboy import WindowEvent
 from gym.spaces import Discrete
 import numpy as np
+import difflib
 
 class Mario:
   def __init__(self, state_dim, action_dim, save_dir ):
@@ -17,7 +18,6 @@ class Mario:
     self._DO_NOTHING = WindowEvent.PASS
     self._buttons = [
       WindowEvent.PRESS_ARROW_RIGHT,
-      WindowEvent.PRESS_ARROW_LEFT,
       WindowEvent.PRESS_BUTTON_A,
       WindowEvent.RELEASE_BUTTON_A
       ]
@@ -53,22 +53,25 @@ class Mario:
     if np.random.rand() < self.exploration_rate_min:  # Exploration
       action = np.random.choice(list(actionDict.keys()))
     else:  # Exploitation
-      action = max(actionDict,key=actionDict.get )
-                      
+      print(actionDict.values())
+      action = max(actionDict,key=actionDict.get )  
     return action
 
   def saveQ_function(self):
     np.save(self.Q_learningFunction_file, self.q_dict)
+    my_string = str(self.q_dict)
     return
 
   def loadQ_function(self):
     try:
       data=np.load(self.Q_learningFunction_file, allow_pickle="TRUE")
       self.q_dict = data.item()
-    except :
-      None
-    
-    return
+      return True
+    except  :
+      return False
+
+
+      
   """
   # Given a state, choose epsilon-greedy action and update the value of the step
   # EXPLORE epsilon greedy

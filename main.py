@@ -25,27 +25,32 @@ dim = game_wrapper.shape
 
 agent = Mario(state_dim=(1, dim[1], dim[0]), action_dim=env.action_space.n, save_dir=dir)
 agent.exploration_rate = 1
-episodes = 50000
+episodes = 5000000
+start = True
 
-agent.loadQ_function()
-for i in range(episodes):
-    print(f"episode : {i}")
-    state = env.reset()
-    while True:
+if (not agent.loadQ_function()):
+    if(not agent.loadQ_function()):
+        print("the file could not be oppenned")
+        start= False
 
-        # Random action for testing
-        action = agent.act(state)
+if start:
+    agent.checkDict()
+    for i in range(episodes):
+        print(f"episode : {i}")
+        state = env.reset()
+        while True:
 
+            # Random action for testing
+            action = agent.act(state)
 
-        # Agent performs action
-        next_state, reward, done, info = env.step(action)
-        agent.Q_learning(state,next_state,action,reward)
+            # Agent performs action
+            next_state, reward, done, info = env.step(action)
+            agent.Q_learning(state,next_state,action,reward)
+            print(reward)
+            # Update state
+            state = next_state
+
+            if done:
+                break
         agent.saveQ_function()
-        print(reward)
-        # Update state
-        state = next_state
-
-        if done:
-            break
-
 
