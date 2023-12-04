@@ -2,6 +2,7 @@ from pyboy import PyBoy
 from mario import Mario
 from CustomEnv import CustomEnv
 from SkipFrame import SkipFrame
+from MetricLogger import MetricLogger
 
 import numpy as np
 from pathlib import Path
@@ -25,11 +26,18 @@ dim = game_wrapper.shape
 
 agent = Mario(state_dim=(1, dim[1], dim[0]), action_dim=env.action_space.n, save_dir=dir)
 agent.exploration_rate = 1
-episodes = 50000
+episodes = 20
 
 states_path = 'states'
 # File for states!
 files = os.listdir(states_path)
+
+# Metric logger
+# The progress is saved in a checkpoint folder
+save_dir = Path("checkpoints") / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+save_dir.mkdir(parents=True)
+
+logger = MetricLogger(save_dir)
 
 agent.loadQ_function()
 for i in range(episodes):
@@ -53,11 +61,21 @@ for i in range(episodes):
         agent.Q_learning(state,next_state,action,reward)
         # Update state
         state = next_state
+
+        # Log rewards
+        logger.log_step(reward)
         
         # There is a bug however now, if mario gets a mushroo, the game will reset as it will trigger a RAM value that is used for
         # Checking if mario has died
-        
+
         if done or env.respawned == False:
             break
+    
+    logger.log_episode(game_wrapper._level_progress_max)
+
+    if (i % 20 == 0) or (i == episodes - 1):
+        # Log information every 20 episode
+        logger.record(episode=i, epsilon=agent.exploration_rate, step=agent.curr_step)
+
     agent.saveQ_function()
 
