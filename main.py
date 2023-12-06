@@ -28,13 +28,9 @@ agent.exploration_rate = 1
 episodes = 5000000
 start = True
 
-if (not agent.loadQ_function()):
-    if(not agent.loadQ_function()):
-        print("the file could not be oppenned")
-        start= False
+
 
 if start:
-    agent.checkDict()
     for i in range(episodes):
         print(f"episode : {i}")
         state = env.reset()

@@ -54,14 +54,14 @@ class CustomEnv(PyBoyGymEnv):
     if (0<self.pyboy.get_memory_value(0xC0AC)<5):
         if self.respawned:
             # Since this is behind a flag and it occurs only once for every frame skip
-            reward -= 70
+            reward -= 100
             self.respawned = False
 
     # CHECK IF MARIO FELL OUT OF MAP
     if (self.pyboy.get_memory_value(0xC201)>183):
         if self.respawned:
             # Since this is behind a flag and it occurs only once for every frame skip
-            reward -= 70
+            reward -= 100
             self.respawned = False
 
     self.prevState = currState

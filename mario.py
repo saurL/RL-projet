@@ -44,6 +44,7 @@ class Mario:
     nextStateKey = next_state.tobytes()
     current_q_values = self.q_dict.get(currentStateKey, self.defaultActionDict)
     current_q_values[action] = (1 - self.learning_rate) * current_q_values[action] + self.learning_rate * (reward + self.discount_factor * max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
+    print(max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
     self.q_dict[currentStateKey] = current_q_values
     return
 
