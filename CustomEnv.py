@@ -33,10 +33,15 @@ class CustomEnv(PyBoyGymEnv):
 
     # current state
     currState = GameState(self.pyboy)
+    
+    # Time and x pos reseting happens between ticks, so if the difference is larger than 1, reset clock and x pos
+    # In order to avoid big minus reward for spawning.
+    # If unnaturally large change happens, the values should be equal
+    if currState.time_left - self.prevState.time_left > 1 or currState.time_left - self.prevState.time_left < -1:
+        self.prevState.time_left = currState.time_left
 
-    # Time reseting happens weirdly between ticks, so if the difference is larger than 1, reset clock     
-    if currState.time_left - self.prevState.time_left > 1:
-        self.prevState.time_left = 400
+    if currState.real_x_pos  - self.prevState.real_x_pos > 10 or currState.real_x_pos  - self.prevState.real_x_pos < -10:
+        self.prevState.real_x_pos = currState.real_x_pos
 
     # IF LIVES HAVE CHANGED MARIO SHOULD HAVE RESPAWNED
     if (currState.lives_left < self.prevState.lives_left):
@@ -63,7 +68,12 @@ class CustomEnv(PyBoyGymEnv):
             # Since this is behind a flag and it occurs only once for every frame skip
             reward -= 100
             self.respawned = False
-
+          
+    # CHECK IF TERE IS A RESPAWN TIMER
+    if self.pyboy.get_memory_value(0xFFA6)  > 0:
+        self.respawned = False
+        reward = 0
+    
     self.prevState = currState
     observation = self._get_observation()
     done = pyboy_done or self.game_wrapper.game_over()

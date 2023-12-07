@@ -1,17 +1,27 @@
+import datetime
+from pathlib import Path
 from pyboy import WindowEvent
 from gym.spaces import Discrete
 import numpy as np
 import difflib
+from MetricLogger import MetricLogger
 
 class Mario:
-  def __init__(self, state_dim, action_dim, save_dir ):
+  def __init__(self, state_dim, action_dim, save_dir , old_version = None):
     self.state_dim = state_dim
     self.action_dim = action_dim
-    self.save_dir = save_dir
+
+    # Metric logger
+    # The progress is saved in a checkpoint folders
+
+    self.save_dir = Path(save_dir) / datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    self.save_dir.mkdir(parents=True)
+
+    self.logger = MetricLogger(self.save_dir)
 
     self.exploration_rate = 1
-    self.exploration_rate_decay = 0.99999975
-    self.exploration_rate_min = 0.1
+    self.exploration_rate_decay = 0.00000005
+    self.exploration_rate_min = 0.05
     self.curr_step = 0
 
     # Define the different action of our agent 
@@ -38,68 +48,35 @@ class Mario:
  
     self.previousStates = []
     # Define our policy by random policy if no policy is given
+        ## if we want to load our data Q_function from other learning state
+    if(old_version):
+      old_version_path = Path(save_dir) /old_version
+      self.logger.loadOlderVersion(old_version_path)
+      self.exploration_rate = self.logger.getOldEpsilon(old_version_path)
+      self.q_dict = self.logger.getOldQ_fucntion(old_version_path)
+    
     
   def Q_learning(self,current_state,next_state,action,reward):
     currentStateKey= current_state.tobytes()
     nextStateKey = next_state.tobytes()
     current_q_values = self.q_dict.get(currentStateKey, self.defaultActionDict)
     current_q_values[action] = (1 - self.learning_rate) * current_q_values[action] + self.learning_rate * (reward + self.discount_factor * max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
-    print(max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
     self.q_dict[currentStateKey] = current_q_values
     return
 
   def act(self, state):
     stateKey= state.tobytes()
     actionDict = self.q_dict.get(stateKey, self.defaultActionDict)
-    if np.random.rand() < self.exploration_rate_min:  # Exploration
+    if np.random.rand() < self.exploration_rate:  # Exploration
+
+      # decrease exploration_rate
+      if self.exploration_rate > self.exploration_rate_min:
+        self.exploration_rate-=self.exploration_rate_decay
+
       action = np.random.choice(list(actionDict.keys()))
     else:  # Exploitation
-      print(actionDict.values())
       action = max(actionDict,key=actionDict.get )  
     return action
 
-  def saveQ_function(self):
-    np.save(self.Q_learningFunction_file, self.q_dict)
-    my_string = str(self.q_dict)
-    return
-
-  def loadQ_function(self):
-    try:
-      data=np.load(self.Q_learningFunction_file, allow_pickle="TRUE")
-      self.q_dict = data.item()
-      return True
-    except  :
-      return False
-
-
-      
-  """
-  # Given a state, choose epsilon-greedy action and update the value of the step
-  # EXPLORE epsilon greedy
-
-  # Mario has 30% chance to walk right
-
-  if np.random.rand() < self.exploration_rate:
-
-    action_idx = np.random.randint(self.action_dim)
-
-  # EXPLOIT
-  else:
-      # Implement exploitation here!!!
-      '''
-      state = np.array(state,dtype = float)
-      action_values = 
-      action_idx = torch.argmax(action_values, dim=1).item()
-      '''
-
-  # decrease exploration_rate
-  self.exploration_rate *= self.exploration_rate_decay
-  self.exploration_rate = max(self.exploration_rate_min, self.exploration_rate)
-
-  # increment step
-  self.curr_step += 1
-  return action_idx
-  """
-  # cache(): Each time Mario performs an action, he stores the experience to his memory.
-  # His experience includes the current state, action performed, reward from the action,
-  # the next state, and whether the game is done.
+  def record(self,episode):
+    self.logger.record(episode,self.exploration_rate,self.curr_step,self.q_dict)
