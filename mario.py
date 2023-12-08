@@ -41,7 +41,7 @@ class Mario:
 
     # Q_learning value
     self.Q_learningFunction_file="Q_function.npy"
-    self.learning_rate = 0.8
+    self.learning_rate = 0.01 # Changed from 0.8 as it is way too high for this
     self.discount_factor = 0.95
     self.defaultActionDict={key: 0 for key in self.actions}
     self.q_dict = {}
