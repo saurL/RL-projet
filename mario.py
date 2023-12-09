@@ -20,7 +20,7 @@ class Mario:
     self.logger = MetricLogger(self.save_dir)
 
     self.exploration_rate = 1
-    self.exploration_rate_decay = 0.00000005
+    self.exploration_rate_decay = 0.99999975
     self.exploration_rate_min = 0.05
     self.curr_step = 0
 
@@ -41,7 +41,7 @@ class Mario:
 
     # Q_learning value
     self.Q_learningFunction_file="Q_function.npy"
-    self.learning_rate = 0.8
+    self.learning_rate = 0.2
     self.discount_factor = 0.95
     self.defaultActionDict={key: 0 for key in self.actions}
     self.q_dict = {}
@@ -54,12 +54,15 @@ class Mario:
       self.logger.loadOlderVersion(old_version_path)
       self.exploration_rate = self.logger.getOldEpsilon(old_version_path)
       self.q_dict = self.logger.getOldQ_fucntion(old_version_path)
+    print(self.defaultActionDict)
     
     
   def Q_learning(self,current_state,next_state,action,reward):
     currentStateKey= current_state.tobytes()
     nextStateKey = next_state.tobytes()
-    current_q_values = self.q_dict.get(currentStateKey, self.defaultActionDict)
+    if reward==0:
+      return
+    current_q_values = self.q_dict.get(currentStateKey, self.defaultActionDict.copy())
     current_q_values[action] = (1 - self.learning_rate) * current_q_values[action] + self.learning_rate * (reward + self.discount_factor * max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
     self.q_dict[currentStateKey] = current_q_values
     return
@@ -68,14 +71,16 @@ class Mario:
     stateKey= state.tobytes()
     actionDict = self.q_dict.get(stateKey, self.defaultActionDict)
     if np.random.rand() < self.exploration_rate:  # Exploration
-
       # decrease exploration_rate
       if self.exploration_rate > self.exploration_rate_min:
-        self.exploration_rate-=self.exploration_rate_decay
+        self.exploration_rate*=self.exploration_rate_decay
+        self.exploration_rate = max(self.exploration_rate,self.exploration_rate_min)
 
       action = np.random.choice(list(actionDict.keys()))
     else:  # Exploitation
+
       action = max(actionDict,key=actionDict.get )  
+
     return action
 
   def record(self,episode):

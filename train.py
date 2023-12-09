@@ -24,25 +24,18 @@ env = SkipFrame(env, skip=4)
 game_wrapper = pyboy.game_wrapper()
 dim = game_wrapper.shape
 dir = "checkpoints"
-agent = Mario(state_dim=(1, dim[1], dim[0]), action_dim=env.action_space.n, save_dir=dir, old_version="2023-12-07T17-17-43" )
+agent = Mario(state_dim=(1, dim[1], dim[0]), action_dim=env.action_space.n, save_dir=dir,)
 
 
 states_path = 'states'
 # File for states!
 files = os.listdir(states_path)
 
-episodes = 100
+episodes = 10000
 
 for i in range(episodes):
-    print(f"episode : {i}")
     state = env.reset()
 
-    # 50% chance to start from a checkpoint
-    if random.random() > 0.5:
-        random_file = random.choice(files)
-        file_path = os.path.join(states_path, random_file)
-        with open(file_path, 'rb') as file_like_object:
-            env.pyboy.load_state(file_like_object)
     while True:
 
         # Random action for testing
