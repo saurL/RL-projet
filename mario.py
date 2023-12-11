@@ -31,7 +31,7 @@ class Mario:
         self._buttons = [
             WindowEvent.PRESS_ARROW_RIGHT,
             WindowEvent.PRESS_BUTTON_A,
-
+            WindowEvent.RELEASE_BUTTON_A
         ]
 
         self._buttons_release = [
@@ -69,6 +69,15 @@ class Mario:
             reward + self.discount_factor * max(self.q_dict.get(nextStateKey, self.defaultActionDict).values()))
         self.q_dict[currentStateKey] = current_q_values
         return
+
+    def showInformation(self, current_state, next_state, reward, action):
+        currentStateKey = current_state.tobytes()
+        nextStateKey = next_state.tobytes()
+        current_q_values = self.q_dict.get(
+            currentStateKey, self.defaultActionDict.copy())
+        if reward < -50:
+            print(reward)
+            print(current_q_values)
 
     def act(self, state):
         stateKey = state.tobytes()
